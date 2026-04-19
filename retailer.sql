@@ -49,5 +49,18 @@ SELECT
     COUNT(CASE WHEN active_months = 12 THEN 1 END) * 1.0
     / COUNT(*) AS full_year_retention_rate
 FROM counts; -- rate
-
 -- ============================================================================== 
+
+-- Retailers who didn't create any orders 
+SELECT 
+    r.retailer_id,r.retailer_name,r.registration_date
+FROM dim_retailers r
+LEFT JOIN fact_order_details o ON o.retailer_id = r.retailer_id
+where o.retailer_id IS NULL;
+
+-- Retailers who created orders but Pending
+SELECT 
+    r.retailer_id,r.retailer_name
+FROM dim_retailers r
+LEFT JOIN fact_order_details o ON o.retailer_id = r.retailer_id
+where o.order_status = 'Pending';
