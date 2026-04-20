@@ -64,3 +64,45 @@ SELECT
 FROM dim_retailers r
 LEFT JOIN fact_order_details o ON o.retailer_id = r.retailer_id
 where o.order_status = 'Pending';
+-- ==============================================================================
+
+-- City-Wise Demand: Unique retailers count + total revenue per city 
+SELECT 
+	a.city,
+	COUNT(DISTINCT retailer_id) as retailers_count,
+	SUM(line_total) as total_revenue
+FROM dim_areas a
+JOIN fact_order_details o 
+ON a.area_id = o.area_id
+group by a.city;
+
+
+-- Supplier Ratings: Find average line_total per supplier_name where rating > 4.0
+SELECT 
+	supplier_name,
+	AVG(line_total) as avg_line_total
+FROM dim_suppliers S
+JOIN fact_order_details O
+ON O.supplier_id = S.supplier_id
+WHERE rating > 4
+group by supplier_name;
+
+
+-- Churn Risk Identification:Inactive 60 days + GMV > 5000 retailers
+WITH retailer_stats AS (
+    SELECT 
+        retailer_id,
+        MAX(order_date) AS last_order_date,
+        SUM(line_total) AS total_gmv
+    FROM fact_order_details
+    group by retailer_id
+)
+
+SELECT 
+    retailer_id,
+    last_order_date,
+    total_gmv
+FROM retailer_stats
+WHERE 
+    DATEDIFF(DAY, last_order_date, GETDATE()) > 60
+    AND total_gmv > 5000;
