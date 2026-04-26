@@ -37,52 +37,56 @@ CREATE TABLE dim_date (
 
 CREATE TABLE dim_retailers (
     retailer_id INT PRIMARY KEY,
-    retailer_name NVARCHAR(255),
-    segment NVARCHAR(100),
-    city NVARCHAR(100),
-    province NVARCHAR(100),
+    retailer_name VARCHAR(255),
+    segment VARCHAR(100),
+    city VARCHAR(100),
+    province VARCHAR(100),
     cohort_year SMALLINT,
-    preferred_payment NVARCHAR(100),
+    preferred_payment VARCHAR(100),
     registration_date DATE
 );
 
 CREATE TABLE dim_suppliers (
     supplier_id INT PRIMARY KEY,
-    supplier_name NVARCHAR(255),
-    rating DECIMAL(5,2),
-    city NVARCHAR(100),
-    province NVARCHAR(100),
-    primary_category NVARCHAR(100),
-    category_group NVARCHAR(100),
-    established_year SMALLINT
+    supplier_name VARCHAR(255),
+    supplier_rating DECIMAL(5,2),
+    city VARCHAR(100),
+    province VARCHAR(100),
+    primary_category VARCHAR(100),
+    category_group VARCHAR(100),
+    established_year SMALLINT,
+    spec_group_id SMALLINT
 );
 
 CREATE TABLE dim_products (
     product_id INT PRIMARY KEY,
-    product_name NVARCHAR(255),
-    category NVARCHAR(100),
-    sku NVARCHAR(100),
+    product_name VARCHAR(255),
+    category VARCHAR(100),
+    sku VARCHAR(100),
     unit_price DECIMAL(18,2)
 );
 
 CREATE TABLE dim_areas (
     area_id INT PRIMARY KEY,
-    city NVARCHAR(100),
-    province NVARCHAR(100),
-    neighborhood NVARCHAR(100),
-    area_name NVARCHAR(100),
-    is_cold BIT NOT NULL
+    city VARCHAR(100),
+    province VARCHAR(100),
+    neighborhood VARCHAR(100),
+    area_name VARCHAR(100),
+    is_cold BIT NOT NULL,
+    city_pop_weight DECIMAL(5,2)
 );
+
 
 CREATE TABLE dim_drivers (
     driver_id INT PRIMARY KEY,
-    driver_name NVARCHAR(255),
-    vehicle_type NVARCHAR(50),
-    rating DECIMAL(5,2),
-    city NVARCHAR(100),
-    province NVARCHAR(100),
+    driver_name VARCHAR(255),
+    vehicle_type VARCHAR(50),
+    driver_rating DECIMAL(5,2),
+    city VARCHAR(100),
+    province VARCHAR(100),
     hire_year SMALLINT,
-    active BIT
+    active BIT,
+    primary_area_id tinyint
 );
 
 -- ==============================================================================
@@ -101,8 +105,7 @@ CREATE TABLE fact_order_details (
     order_status NVARCHAR(50),
     quantity INT NOT NULL,
     unit_price DECIMAL(18,2) NOT NULL,
-    line_total DECIMAL(18,2) NOT NULL,
-    gmv DECIMAL(18,2),
+    line_total DECIMAL(18,2) NOT NULL
 
     CONSTRAINT FK_fact_order_details_date     FOREIGN KEY (order_date)   REFERENCES dim_date([date]),
     CONSTRAINT FK_fact_order_details_retailer FOREIGN KEY (retailer_id)  REFERENCES dim_retailers(retailer_id),
@@ -116,11 +119,11 @@ CREATE TABLE fact_payments (
     payment_id INT PRIMARY KEY,
     order_id INT NOT NULL,
     retailer_id INT NOT NULL,
-    payment_method NVARCHAR(50) NOT NULL,
-    payment_status NVARCHAR(50) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    payment_status VARCHAR(50) NOT NULL,
     amount DECIMAL(18,2) NOT NULL,
     payment_date DATE,
-    currency NVARCHAR(10),
+    currency VARCHAR(10),
 
     CONSTRAINT FK_fact_payments_retailer FOREIGN KEY (retailer_id) REFERENCES dim_retailers(retailer_id),
     CONSTRAINT FK_fact_payments_date     FOREIGN KEY (payment_date) REFERENCES dim_date([date])
@@ -134,9 +137,12 @@ CREATE TABLE fact_deliveries (
     scheduled_date DATE NOT NULL,
     scheduled_at DATETIME NOT NULL,
     actual_at DATETIME NULL,
-    delivery_status NVARCHAR(50),
+    delivery_status VARCHAR(50),
     delay_hours DECIMAL(10,2) NULL,
-    delay_days DECIMAL(10,2) NULL,
+    extra_delay_days INT NOT NULL,
+    is_cold_city BIT NOT NULL,
+    is_winter_month BIT NOT NULL
+
 
     CONSTRAINT FK_fact_deliveries_driver FOREIGN KEY (driver_id)       REFERENCES dim_drivers(driver_id),
     CONSTRAINT FK_fact_deliveries_area   FOREIGN KEY (area_id)         REFERENCES dim_areas(area_id),
