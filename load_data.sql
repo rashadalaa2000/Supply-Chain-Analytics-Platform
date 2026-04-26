@@ -25,32 +25,34 @@ FROM (
 WHERE dt NOT IN (SELECT [date] FROM dim_date);
 
 -- 3.2 Load Dimensions
-INSERT INTO dim_areas (area_id, city, province, neighborhood, area_name, is_cold)
+
+INSERT INTO dim_areas (area_id, city, province, neighborhood, area_name, is_cold,city_pop_weight )
 SELECT 
     area_id, city, province, neighborhood, area_name,
     CASE WHEN city IN ('Edmonton','Winnipeg','Saskatoon','Regina','Quebec City','Montreal','Calgary') THEN 1 ELSE 0 END
-FROM supply_chain.dbo.source_areas;
+    ,city_pop_weight 
+FROM supply_chain.dbo.source_areas; 
 
 INSERT INTO dim_retailers (retailer_id, retailer_name, segment, city, province, cohort_year, preferred_payment, registration_date)
 SELECT retailer_id, retailer_name, segment, city, province, cohort_year, preferred_payment, registration_date
 FROM supply_chain.dbo.source_retailers;
 
-INSERT INTO dim_suppliers (supplier_id, supplier_name, rating, city, province, primary_category, category_group, established_year)
-SELECT supplier_id, supplier_name, supplier_rating, city, province, primary_category, category_group, established_year
+INSERT INTO dim_suppliers (supplier_id, supplier_name, supplier_rating, city, province, primary_category, category_group, established_year,spec_group_id)
+SELECT supplier_id, supplier_name, supplier_rating, city, province, primary_category, category_group, established_year,spec_group_id
 FROM supply_chain.dbo.source_suppliers;
 
 INSERT INTO dim_products (product_id, product_name, category, sku, unit_price)
 SELECT product_id, product_name, category, sku, CAST(unit_price AS DECIMAL(18,2))
 FROM supply_chain.dbo.source_products;
 
-INSERT INTO dim_drivers (driver_id, driver_name, vehicle_type, rating, city, province, hire_year, active)
-SELECT driver_id, driver_name, vehicle_type, driver_rating, city, province, hire_year, active
+INSERT INTO dim_drivers (driver_id, driver_name, vehicle_type, driver_rating, city, province, hire_year, active,primary_area_id)
+SELECT driver_id, driver_name, vehicle_type, driver_rating, city, province, hire_year, active,primary_area_id
 FROM supply_chain.dbo.source_drivers;
 
 -- 3.3 Load fact_order_details
 INSERT INTO fact_order_details (
     detail_id, order_id, product_id, retailer_id, supplier_id, area_id, driver_id,
-    order_date, order_status, quantity, unit_price, line_total, gmv
+    order_date, order_status, quantity, unit_price, line_total
 )
 SELECT 
     od.detail_id,
@@ -64,8 +66,7 @@ SELECT
     o.order_status,
     CAST(od.quantity AS INT),
     CAST(od.unit_price AS DECIMAL(18,2)),
-    CAST(od.quantity * od.unit_price AS DECIMAL(18,2)),
-    CAST(o.gmv AS DECIMAL(18,2))
+    CAST(od.quantity * od.unit_price AS DECIMAL(18,2))
 FROM supply_chain.dbo.source_orders o
 JOIN supply_chain.dbo.source_order_details od ON o.order_id = od.order_id;
 
@@ -89,7 +90,7 @@ JOIN supply_chain.dbo.source_orders o ON p.order_id = o.order_id;
 INSERT INTO fact_deliveries (
     delivery_id, order_id, driver_id, area_id,
     scheduled_date, scheduled_at, actual_at,
-    delivery_status, delay_hours, delay_days
+    delivery_status, delay_hours,is_cold_city,is_winter_month,extra_delay_days
 )
 SELECT 
     d.delivery_id,
@@ -101,6 +102,8 @@ SELECT
     CAST(d.actual_datetime AS DATETIME),
     d.delivery_status,
     CAST(DATEDIFF(MINUTE, d.scheduled_datetime, d.actual_datetime) AS DECIMAL(10,2)) / 60.0,
-    CAST(DATEDIFF(MINUTE, d.scheduled_datetime, d.actual_datetime) AS DECIMAL(10,2)) / 1440.0
+    CASE WHEN is_cold_city = 'True' THEN 1 ELSE 0 END,
+    is_winter_month,
+    extra_delay_days
 FROM supply_chain.dbo.source_deliveries d
 JOIN supply_chain.dbo.source_orders o ON d.order_id = o.order_id;
