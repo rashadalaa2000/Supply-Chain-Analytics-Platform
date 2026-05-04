@@ -107,9 +107,9 @@ SELECT
     extra_delay_days
 FROM supply_chain.dbo.source_deliveries d
 JOIN supply_chain.dbo.source_orders o ON d.order_id = o.order_id;
+-------------------------------------------------------------------------------------------------------
 
-
--- Transaction
+-- Fix: Update misspelled status values in fact_payments table
 UPDATE fact_payments
 SET payment_status = 'Refunded'
 WHERE payment_status = 'Refunde';
