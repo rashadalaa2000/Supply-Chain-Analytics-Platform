@@ -1,5 +1,5 @@
 # 📦 Supply Chain Data Warehouse — Data Dictionary
-**Project:** `supply_text` | **Schema:** Star Schema | **DB:** SQL Server | 
+**Project:** `supply_chain` | **Schema:** Star Schema | **DB:** SQL Server | 
 **Date Range:** 2020-01-01 → 2025-12-31 | **Market:** Canada (CAD)
 
 ---
