@@ -257,10 +257,10 @@
 
 | order_status | delivery_status | payment_status | Count | Notes |
 |---|---|---|---|---|
-| `Completed` | `Delivered` | `Paid` | 136,250 | ✅ Healthy — standard fulfilled order |
-| `Completed` | `Delayed` | `Paid` | 16,439 | ✅ Acceptable — late but paid |
-| `Cancelled` | `Not Dispat` | `Refunded` | 9,511 | ✅ Expected cancellation flow |
-| `Completed` | `In Transit` | `Paid` | 1,514 | ✅ Likely status sync lag |
+| `Completed` | `Delivered` | `Paid` | 56,794 | ✅ Healthy — standard fulfilled order |
+| `Completed` | `Delayed` | `Paid` | 6,855 | ✅ Acceptable — late but paid |
+| `Cancelled` | `Not Dispat` | `Refunded` | 3,995 | ✅ Expected cancellation flow |
+| `Completed` | `In Transit` | `Paid` | 647 | ✅ Likely status sync lag |
 
 ---
 
@@ -268,38 +268,38 @@
 
 | Severity | order_status | delivery_status | payment_status | Count | Issue |
 |---|---|---|---|---|---|
-| 🔴 Critical | `Pending` | `Delivered` | `Paid` | 10,804 | Order never confirmed but physically delivered and paid |
-| 🟡 High | `Completed` | `Delivered` | `Pending` | 7,950 | Order complete, delivered, but payment still pending |
-| 🟠 Medium | `Completed` | `Failed` | `Paid` | 5,010 | Delivery failed but payment collected — no goods delivered |
-| 🔴 Critical | `Completed` | `Delivered` | `Failed` | 4,072 | Delivered and completed but payment failed — revenue gap |
-| 🟡 High | `Pending` | `Delayed` | `Paid` | 1,288 | Paid for a pending order that is already delayed |
-| 🟠 Medium | `Completed` | `Delayed` | `Pending` | 970 | Completed order with delay but payment not settled |
-| 🟠 Medium | `Pending` | `Failed` | `Paid` | 380 | Delivery failed on a pending order that was paid |
-| 🟡 High | `Pending` | `Delivered` | `Pending` | 711 | Delivered but order still pending and payment not settled |
-| 🔴 Critical | `Pending` | `Delivered` | `Failed` | 315 | Delivered with no valid order confirmation and failed payment |
-| 🟠 Medium | `Completed` | `Failed` | `Pending` | 284 | Failed delivery, order completed, payment not settled |
-| 🟠 Medium | `Completed` | `Delayed` | `Failed` | 499 | Completed order, delayed delivery, payment failed |
-| 🔴 Critical | `Completed` | `Failed` | `Failed` | 125 | Fully completed order with both delivery and payment failures |
-| 🟠 Medium | `Pending` | `Delayed` | `Pending` | 82 | Stalled order — delayed and unpaid |
-| 🟠 Medium | `Completed` | `In Transit` | `Failed` | 54 | Marked complete but still in transit with failed payment |
-| 🟡 High | `Completed` | `In Transit` | `Pending` | 99 | Marked complete but still in transit |
-| 🟠 Medium | `Pending` | `Delayed` | `Failed` | 28 | Delayed, pending, and payment failed |
-| 🟠 Medium | `Pending` | `Failed` | `Failed` | 26 | Double failure on pending order |
-| 🟠 Medium | `Pending` | `Failed` | `Pending` | 24 | Failed delivery on unconfirmed, unpaid order |
-| 🟠 Medium | `Pending` | `In Transit` | `Pending` | 7 | In transit but order and payment both pending |
-| 🔴 Critical | `Pending` | `In Transit` | `Failed` | 4 | In transit with unconfirmed order and failed payment |
-
+| 🔴 Critical | `Pending` | `Delivered` | `Paid` | 4,461 | Order never confirmed but physically delivered and paid |
+| 🟡 High | `Completed` | `Delivered` | `Pending` | 3,233 | Order complete, delivered, but payment still pending |
+| 🟠 Medium | `Completed` | `Failed` | `Paid` | 2,044 | Delivery failed but payment collected — no goods delivered |
+| 🔴 Critical | `Completed` | `Delivered` | `Failed` | 1,714 | Delivered and completed but payment failed — revenue gap |
+| 🟡 High | `Pending` | `Delayed` | `Paid` | 525 | Paid for a pending order that is already delayed |
+| 🟠 Medium | `Completed` | `Delayed` | `Pending` | 420 | Completed order with delay but payment not settled |
+| 🟠 Medium | `Pending` | `Failed` | `Paid` | 156 | Delivery failed on a pending order that was paid |
+| 🟡 High | `Pending` | `Delivered` | `Pending` | 288 | Delivered but order still pending and payment not settled |
+| 🔴 Critical | `Pending` | `Delivered` | `Failed` | 138 | Delivered with no valid order confirmation and failed payment |
+| 🟠 Medium | `Completed` | `Failed` | `Pending` | 115 | Failed delivery, order completed, payment not settled |
+| 🟠 Medium | `Completed` | `Delayed` | `Failed` | 209 | Completed order, delayed delivery, payment failed |
+| 🔴 Critical | `Completed` | `Failed` | `Failed` | 50 | Fully completed order with both delivery and payment failures |
+| 🟠 Medium | `Pending` | `Delayed` | `Pending` | 36 | Stalled order — delayed and unpaid |
+| 🟠 Medium | `Completed` | `In Transit` | `Failed` | 21 | Marked complete but still in transit with failed payment |
+| 🟡 High | `Completed` | `In Transit` | `Pending` | 47 | Marked complete but still in transit |
+| 🟠 Medium | `Pending` | `Delayed` | `Failed` | 12 | Delayed, pending, and payment failed |
+| 🟠 Medium | `Pending` | `Failed` | `Failed` | 9 | Double failure on pending order |
+| 🟠 Medium | `Pending` | `Failed` | `Pending` | 7 | Failed delivery on unconfirmed, unpaid order |
+| 🟠 Medium | `Pending` | `In Transit` | `Pending` | 3 | In transit but order and payment both pending |
+| 🔴 Critical | `Pending` | `In Transit` | `Failed` | 2 | In transit with unconfirmed order and failed payment |
+| 🟡 High | `Pending` | `In Transit` | `Paid` | 56 | **Logistics moved ahead of order confirmation — system lag** |
 ---
 
 ### Anomaly Summary by Severity
 
 | Severity | Combinations | Total Records |
 |---|---|---|
-| 🔴 Critical | 5 | 15,320 |
-| 🟡 High | 5 | 11,038 |
-| 🟠 Medium | 10 | 2,548 |
-| **Total anomalous** | **20** | **28,906** |
+| 🔴 Critical | 5 | 6,365 |
+| 🟡 High | 5 | 4,149 |
+| 🟠 Medium | 10 | 3,032 |
+| **Total anomalous** | **20** | **13,546** |
 
-> **28,906 records (~14.8% of total)** have cross-status inconsistencies and require data quality review or ETL correction.
+> **13,546 records (~16.5% of total)** have cross-status inconsistencies and require data quality review or ETL correction.
 
 ---
