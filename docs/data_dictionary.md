@@ -24,7 +24,7 @@
 
 | Table | Type | PK | Rows (approx) | Description |
 |---|---|---|---|---|
-| `fact_order_details` | Fact | `detail_id` | ~196K | Core transaction grain — one row per order line |
+| `fact_order_details` | Fact | `detail_id` | ~196K | Core transaction grain — Multiple rows per order line item to capture |
 | `fact_payments` | Fact | `payment_id` | ~81.8K | Payment events per order |
 | `fact_deliveries` | Fact | `delivery_id` | ~81.8K | Delivery tracking events |
 | `dim_retailers` | Dimension | `retailer_id` | 500 | Retailer master — 18 Canadian cities |
@@ -38,7 +38,7 @@
 
 ## fact_order_details
 
-> One row per order line item. Central fact table linking all 6 dimensions.
+> Multiple rows per order line item to capture. Central fact table linking all 6 dimensions.
 
 | Column | Type | Key | Nullable | Description | Actual Values |
 |---|---|---|---|---|---|
@@ -76,7 +76,7 @@
 
 ## fact_deliveries
 
-> Multiple rows per order line item to capture. Tracks scheduled vs actual delivery with delay metrics.
+> One delivery record per order. Tracks scheduled vs actual delivery with delay metrics.
 
 | Column | Type | Key | Nullable | Description | Actual Values |
 |---|---|---|---|---|---|
