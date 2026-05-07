@@ -76,7 +76,7 @@
 
 ## fact_deliveries
 
-> One delivery record per order. Tracks scheduled vs actual delivery with delay metrics.
+> Multiple rows per order line item to capture. Tracks scheduled vs actual delivery with delay metrics.
 
 | Column | Type | Key | Nullable | Description | Actual Values |
 |---|---|---|---|---|---|
