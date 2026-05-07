@@ -202,9 +202,9 @@
 
 | Value | Count | % | Description | Terminal? | Valid Transitions |
 |---|---|---|---|---|---|
-| `Completed` | 173,266 | 88.6% | Order fully processed and closed | ✅ Yes | — |
-| `Pending` | 13,804 | 7.1% | Order placed, awaiting processing | No | → Completed, Cancelled |
-| `Cancelled` | 9,511 | 4.9% | Order cancelled before fulfilment | ✅ Yes | — |
+| `Completed` | 72,149 | 88.6% | Order fully processed and closed | ✅ Yes | — |
+| `Pending` | 5,693 | 7.1% | Order placed, awaiting processing | No | → Completed, Cancelled |
+| `Cancelled` | 3,995 | 4.9% | Order cancelled before fulfilment | ✅ Yes | — |
 
 > ⚠️ **Note:** No `Shipped` or `Confirmed` status exists in actual data. Only 3 values observed.
 
