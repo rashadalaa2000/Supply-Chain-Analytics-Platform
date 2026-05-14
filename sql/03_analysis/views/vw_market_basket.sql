@@ -10,8 +10,8 @@ WITH ProductPairs AS (
     GROUP BY A.product_id, B.product_id
 )
 SELECT 
-    PR1.product_name AS Item_1, 
-    PR2.product_name AS Item_2, 
+    PR1.product_name AS product_1, 
+    PR2.product_name AS product_2, 
     Frequency
 FROM ProductPairs
 JOIN dim_products PR1 ON PR1.product_id = P1
