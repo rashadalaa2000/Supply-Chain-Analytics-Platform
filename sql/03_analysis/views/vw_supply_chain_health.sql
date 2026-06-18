@@ -1,5 +1,5 @@
-CREATE OR ALTER VIEW  vw_supply_chain_health AS
-
+CREATE OR ALTER VIEW vw_supply_chain_health AS
+    
 WITH SupplyChain_Data_Check AS (
     SELECT 
         f.order_id,
@@ -23,52 +23,51 @@ SELECT
     
 CASE 
     WHEN delivery_status = 'Delivered' AND payment_status = 'Paid'
-        THEN 'Success (Revenue Realized)'
+        THEN 'Completed - Revenue Realized'
     WHEN delivery_status = 'Delivered' AND payment_status = 'Pending' AND payment_method LIKE 'Net-%'
-        THEN 'Healthy Accrual (B2B Net Terms)'
+        THEN 'Completed - Healthy Accrual'
     WHEN delivery_status = 'Delivered' AND payment_status = 'Failed'
-        THEN 'Critical Loss (Delivered - Payment Failed)'
+        THEN 'Completed - Payment Failed'
     WHEN delivery_status = 'Delivered' AND payment_status = 'Pending' AND payment_method NOT LIKE 'Net-%'
-        THEN 'Uncollected Cash (Settlement Risk)'
+        THEN 'Completed - Payment Pending'
     WHEN order_status = 'Cancelled' AND delivery_status = 'In Transit'
-        THEN 'Logistics Disaster (Cancelled - Still Shipping)'
+        THEN 'Cancelled - In Transit'
     WHEN order_status = 'Cancelled' AND delivery_status = 'Delivered'
-        THEN 'Logistics Disaster (Cancelled - Already Delivered)'
+        THEN 'Cancelled - Already Delivered'
     WHEN order_status = 'Cancelled' AND delivery_status = 'Delayed'
-        THEN 'Logistics Disaster (Cancelled - Delayed Shipment)'
+        THEN 'Cancelled - Delayed Shipment'
     WHEN order_status = 'Cancelled' AND delivery_status = 'Not Dispatched' AND payment_status = 'Refunded'
-        THEN 'Safe Cancellation (Refunded - Not Shipped)'
+        THEN 'Cancelled - Refunded'
     WHEN order_status = 'Cancelled' AND delivery_status = 'Not Dispatched' AND payment_status = 'Paid'
-        THEN 'Cancellation Pending Refund (Not Shipped - Paid)'
+        THEN 'Cancelled - Refund Pending'
     WHEN order_status = 'Cancelled' AND delivery_status = 'Not Dispatched' AND payment_status = 'Pending'
-        THEN 'Safe Cancellation (Not Shipped - No Payment)'
+        THEN 'Cancelled - No Payment'
     WHEN payment_status = 'Paid' AND delivery_status = 'Failed'
-        THEN 'Logistics Waste (Paid - Delivery Failed)'
+        THEN 'In Progress - Delivery Failed'
     WHEN payment_status = 'Paid' AND delivery_status = 'Delayed'
-        THEN 'At Risk (Paid - Delivery Delayed)'
+        THEN 'In Progress - Delivery Delayed'
     WHEN delivery_status = 'Failed' AND payment_status = 'Failed'
-        THEN 'Double Failure (Delivery Failed - Payment Failed)'
+        THEN 'Failed - Delivery and Payment'
     WHEN delivery_status = 'Failed' AND payment_status = 'Pending'
-        THEN 'Logistics Failure (Delivery Failed - Awaiting Payment)'
+        THEN 'Failed - Delivery Issue'
     WHEN payment_status = 'Refunded' AND delivery_status != 'Not Dispatched'
-        THEN 'Costly Refund (Shipping Cost Wasted)'
+        THEN 'Refunded - Already Shipped'
     WHEN payment_status = 'Refunded' AND delivery_status = 'Not Dispatched'
-        THEN 'Safe Refund (No Shipping Cost)'
+        THEN 'Refunded - Not Shipped'
     WHEN delivery_status = 'In Transit' AND payment_status = 'Failed'
-        THEN 'At Risk (In Transit - Payment Failed)'
+        THEN 'In Progress - Payment Failed'
     WHEN delivery_status = 'In Transit' AND payment_status = 'Pending'
-        THEN 'In Progress (In Transit - Awaiting Payment)'
+        THEN 'In Progress - Payment Pending'
     WHEN delivery_status = 'In Transit' AND payment_status = 'Paid'
-        THEN 'In Progress (In Transit - Paid)'
+        THEN 'In Progress - Payment Received'
     WHEN delivery_status = 'Delayed' AND payment_status = 'Failed'
-        THEN 'At Risk (Delayed - Payment Failed)'
+        THEN 'In Progress - Delayed and Payment Failed'
     WHEN delivery_status = 'Delayed' AND payment_status = 'Pending'
-        THEN 'In Progress (Delayed - Awaiting Payment)'
+        THEN 'In Progress - Delayed and Payment Pending'
     WHEN order_status = 'Pending' AND delivery_status = 'Delivered' AND payment_status = 'Paid'
-        THEN 'Success - Order Confirmation Lagging'
-    ELSE 'Uncategorized - Review Needed'
+        THEN 'Completed - Status Out of Sync'
+    ELSE 'Uncategorized'
 END AS business_impact
-
 FROM SupplyChain_Data_Check
 GROUP BY 
     order_status, 
