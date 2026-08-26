@@ -1,7 +1,7 @@
 IF OBJECT_ID('tempdb..#PaidOrders') IS NOT NULL DROP TABLE #PaidOrders;
 SELECT DISTINCT order_id
 INTO #PaidOrders
-FROM fact_payments
+FROM fact_orders
 WHERE payment_status = 'Paid';
 
 IF OBJECT_ID('tempdb..#Base') IS NOT NULL DROP TABLE #Base;

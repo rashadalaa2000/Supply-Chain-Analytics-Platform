@@ -6,14 +6,13 @@ WITH SupplyChain_Data_Check AS (
     SELECT 
         f.order_id,
         f.order_status,
-        d.delivery_status,
-        p.payment_status,
+        o.delivery_status,
+        o.payment_status,
         f.line_total,
         f.area_id,
-        p.payment_method
+        o.payment_method
     FROM fact_order_details f
-    LEFT JOIN fact_payments p ON f.order_id = p.order_id
-    LEFT JOIN fact_deliveries d ON f.order_id = d.order_id
+    LEFT JOIN fact_orders o ON f.order_id = o.order_id
 )
 SELECT 
     order_status,
@@ -52,7 +51,7 @@ CASE
         THEN 'Logistics Disaster (Cancelled - Delayed Shipment)'
 
     -- Safe Cancellation
-    WHEN order_status = 'Cancelled' AND delivery_status = 'Not Dispatched' AND payment_status = 'Refunde'
+    WHEN order_status = 'Cancelled' AND delivery_status = 'Not Dispatched' AND payment_status = 'Refunded'
         THEN 'Safe Cancellation (Refunded - Not Shipped)'
 
     -- Cancellation Pending Refund
@@ -80,11 +79,11 @@ CASE
         THEN 'Logistics Failure (Delivery Failed - Awaiting Payment)'
 
     -- Costly Refund
-    WHEN payment_status = 'Refunde' AND delivery_status != 'Not Dispatched'
+    WHEN payment_status = 'Refunded' AND delivery_status != 'Not Dispatched'
         THEN 'Costly Refund (Shipping Cost Wasted)'
 
     -- Safe Refund
-    WHEN payment_status = 'Refunde' AND delivery_status = 'Not Dispatched'
+    WHEN payment_status = 'Refunded' AND delivery_status = 'Not Dispatched'
         THEN 'Safe Refund (No Shipping Cost)'
 
     -- At Risk 

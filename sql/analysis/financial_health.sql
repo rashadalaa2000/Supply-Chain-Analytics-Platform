@@ -6,18 +6,17 @@ WITH SupplyChain_Data_Check AS (
     SELECT 
         f.order_id,
         f.order_status,
-        d.delivery_status,
-        p.payment_status,
+        o.delivery_status,
+        o.payment_status,
         f.line_total,
         f.area_id,
-        p.payment_method
+        o.payment_method
     FROM fact_order_details f
-    LEFT JOIN fact_payments p ON f.order_id = p.order_id
-    LEFT JOIN fact_deliveries d ON f.order_id = d.order_id
+    LEFT JOIN fact_orders o ON f.order_id = o.order_id
 )
 SELECT
 
-    SUM(CASE WHEN payment_status = 'Paid'    AND delivery_status = 'Delivered'  
+    SUM(CASE WHEN payment_status = 'Paid'    AND delivery_status = 'Delivered' AND order_status = 'Completed'  
         THEN line_total ELSE 0 END)  AS Realized_Revenue,
     SUM(CASE WHEN payment_status = 'Pending' AND delivery_status = 'Delivered' AND payment_method LIKE 'Net-%'    
         THEN line_total ELSE 0 END)  AS B2B_Accrued_Revenue,
@@ -35,9 +34,9 @@ SELECT
         THEN line_total ELSE 0 END)  AS Cancelled_But_Shipped_Loss,
     SUM(CASE WHEN order_status   = 'Cancelled' AND delivery_status = 'Not Dispatched' 
         THEN line_total ELSE 0 END)  AS Safe_Cancellation_Value,
-    SUM(CASE WHEN payment_status = 'Refunde' AND delivery_status != 'Not Dispatched'   
+    SUM(CASE WHEN payment_status = 'Refunded' AND delivery_status != 'Not Dispatched'   
         THEN line_total ELSE 0 END)  AS Costly_Refund_Value,
-    SUM(CASE WHEN payment_status = 'Refunde' AND delivery_status  = 'Not Dispatched' 
+    SUM(CASE WHEN payment_status = 'Refunded' AND delivery_status  = 'Not Dispatched' 
         THEN line_total ELSE 0 END)  AS Safe_Refund_Value,
     SUM(CASE WHEN delivery_status = 'In Transit' AND payment_status = 'Paid'    
         THEN line_total ELSE 0 END)  AS In_Transit_Paid_Pipeline,

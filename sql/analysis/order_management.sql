@@ -80,4 +80,4 @@ SELECT
 FROM fact_order_details fod
 INNER JOIN dim_date d ON fod.order_date = d.[date]
 GROUP BY d.[year], d.[month], d.month_name
-ORDER BY d.[year], d.[month]; 
+ORDER BY d.[year], d.[month];

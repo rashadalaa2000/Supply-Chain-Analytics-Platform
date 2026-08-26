@@ -7,14 +7,14 @@ SELECT
     (SELECT COUNT(DISTINCT product_id) FROM dim_products) AS total_products,
     (SELECT ROUND(SUM(line_total), 2) FROM fact_order_details) AS total_revenue,
     (SELECT ROUND(AVG(line_total), 2) FROM fact_order_details) AS avg_order_value,
-    (SELECT ROUND(SUM(amount), 2) FROM fact_payments WHERE payment_status IN ('Paid', 'Completed')) AS total_collected,
-    (SELECT ROUND(SUM(amount), 2) FROM fact_payments WHERE payment_status NOT IN ('Paid', 'Completed')) AS total_outstanding;
+    (SELECT ROUND(SUM(payment_amount), 2) FROM fact_orders WHERE payment_status IN ('Paid', 'Completed')) AS total_collected,
+    (SELECT ROUND(SUM(payment_amount), 2) FROM fact_orders WHERE payment_status NOT IN ('Paid', 'Completed')) AS total_outstanding;
 
 
 -- Order_to_Cash_Performance
 SELECT 
-    SUM(CASE WHEN payment_status = 'Paid' AND delivery_status = 'Delivered' THEN line_total ELSE 0 END) AS Realized_Revenue,
-    -- (Net Revenue)
+    SUM(CASE WHEN payment_status = 'Paid' AND delivery_status = 'Delivered' THEN line_total ELSE 0 END) AS Cash_Collection,
+    -- (Cash Collection)
     
     SUM(CASE WHEN payment_status = 'Failed' AND delivery_status = 'Delivered' THEN line_total ELSE 0 END) AS Revenue_Loss_Risk,
     -- (Bad Debt / Risk)
@@ -23,5 +23,4 @@ SELECT
     -- (Pending Pipeline)
     
 FROM fact_order_details f
-JOIN fact_payments p ON f.order_id = p.order_id
-JOIN fact_deliveries d ON d.order_id = p.order_id;
+JOIN fact_orders o ON f.order_id = o.order_id;
